@@ -1,0 +1,34 @@
+[package]
+name = "explorer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0"
+mongodb = "3.0.1"
+chrono = "0.4"
+log = "0.4"
+flexi_logger = "0.28"
+diesel = { version = "2.2", features = [ "mysql", "chrono", "serde_json" ] }
+dotenvy = "0.15.7"
+serde_json = "1.0"
+
+[dependencies.tokio]
+version = "1.39"
+features = ["full"]
+
+[dependencies.bson]
+version = "2.9"
+features = ["chrono-0_4"]
+
+[dependencies.serde]
+version = "1.0"
+features = ["derive"]
+
+[dependencies.bf_sparta]
+git = "https://github.com/Community-network/sparta-rust"
+branch = "main"
+
+[dependencies.grpc-rust]
+git = "https://github.com/community-network/grpc-rust"
+branch = "main"
