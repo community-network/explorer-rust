@@ -1,18 +1,19 @@
 mod connectors;
 mod experience_code;
-mod structs;
 
 use std::{env, time::Duration};
 
 use bf_sparta::{cookie_request, sparta_api};
 use connectors::{
-    mongo::MongoClient,
-    mysql::{Experience, MysqlClient},
+    mongo::lib::MongoClient,
+    mysql::{lib::MysqlClient, models::Experience},
 };
 use dotenvy::dotenv;
 use experience_code::ExperienceCode;
 use grpc_rust::{grpc::KingstonClient, modules::CommunityGames};
+use std::sync::{atomic, Arc};
 use tokio::time::sleep;
+use warp::Filter;
 
 async fn connect(
     mut mongo_client: MongoClient,
@@ -65,15 +66,40 @@ async fn main() -> anyhow::Result<()> {
     flexi_logger::Logger::try_with_str("info")?.start()?;
     log::info!("Starting...");
 
+    let last_update = Arc::new(atomic::AtomicI64::new(chrono::Utc::now().timestamp() / 60));
+    let last_update_clone = Arc::clone(&last_update);
+
+    tokio::spawn(async move {
+        let hello = warp::any().map(move || {
+            let last_update_i64 = last_update_clone.load(atomic::Ordering::Relaxed);
+            let now_minutes = chrono::Utc::now().timestamp() / 60;
+
+            // error if 10 minutes without updates
+            if (now_minutes - last_update_i64) > 10 {
+                warp::reply::with_status(
+                    format!("{}", now_minutes - last_update_i64),
+                    warp::http::StatusCode::SERVICE_UNAVAILABLE,
+                )
+            } else {
+                warp::reply::with_status(
+                    format!("{}", now_minutes - last_update_i64),
+                    warp::http::StatusCode::OK,
+                )
+            }
+        });
+        warp::serve(hello).run(([0, 0, 0, 0], 3030)).await;
+    });
+
     let mut client = MysqlClient::connect()?;
 
     let mongo_client = MongoClient::connect().await?;
     let mut session_id = "".to_string();
     let kingston_client = connect(mongo_client, session_id).await?;
     session_id = kingston_client.session_id.clone();
+    let mut current_experience = client.current_experience()?;
 
-    for i in 0..20 as usize {
-        let e_code = ExperienceCode::from_usize(i)?;
+    loop {
+        let e_code = ExperienceCode::from_u32(current_experience)?;
 
         let res = CommunityGames::get_shared_playground_v2(&kingston_client, e_code.clone().into())
             .await?;
@@ -92,9 +118,12 @@ async fn main() -> anyhow::Result<()> {
 
         // don't go to fast, otherwise you will get temporarily blocked.
         sleep(Duration::from_secs(1)).await;
+
+        last_update.store(
+            chrono::Utc::now().timestamp() / 60,
+            atomic::Ordering::Relaxed,
+        );
+        current_experience += 1;
+        client.set_current_experience(current_experience);
     }
-
-    let last_experience_id = client.get_last_experience()?;
-
-    Ok(())
 }

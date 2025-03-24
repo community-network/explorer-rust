@@ -4,34 +4,19 @@ use bf_sparta::cookie::Cookie;
 use dotenvy::dotenv;
 use mongodb::error::Result;
 use mongodb::{results::UpdateResult, Client, Collection};
-use serde::{Deserialize, Serialize};
+
+use super::models::BackendCookie;
 
 pub struct MongoClient {
     pub backend_cookies: Collection<BackendCookie>,
     pub client: Client,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct BackendCookie {
-    pub _id: String,
-    pub sid: String,
-    pub remid: String,
-}
-
-impl From<BackendCookie> for Cookie {
-    fn from(cookie: BackendCookie) -> Self {
-        Cookie {
-            remid: cookie.remid,
-            sid: cookie.sid,
-        }
-    }
-}
-
 impl MongoClient {
     pub async fn connect() -> Result<Self> {
         // Possible env
         dotenv().ok();
-        let mongo_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+        let mongo_url = env::var("MONGO_DETAILS_STRING").expect("MONGO_DETAILS_STRING must be set");
         // Try connect to mongo client
         let client = Client::with_uri_str(mongo_url).await?;
 

@@ -1,42 +1,12 @@
-use self::structs::mysql_schema::experiences::dsl::*;
+use std::env;
+
+use crate::connectors::mysql::schema::current_experiences::dsl::*;
+use crate::connectors::mysql::schema::experiences::dsl::*;
 use anyhow::anyhow;
 use diesel::{associations::HasTable, prelude::*};
 use dotenvy::dotenv;
-use grpc_rust::modules::communitygames::PlaygroundInfo;
-use std::env;
 
-use crate::{
-    experience_code::ExperienceCode,
-    structs::{self, mysql_schema::experiences::share_code},
-};
-
-#[derive(AsChangeset, Queryable, Selectable, Insertable)]
-#[diesel(table_name = structs::mysql_schema::experiences)]
-#[diesel(check_for_backend(diesel::mysql::Mysql))]
-pub struct Experience {
-    experience_id: u32,
-    share_code: String,
-    playground_name: String,
-    playground_description: String,
-
-    playground_data: serde_json::Value,
-}
-
-impl Experience {
-    pub fn init(
-        experience_code: ExperienceCode,
-        playground: PlaygroundInfo,
-    ) -> anyhow::Result<Self> {
-        let p_data = playground.clone().original_playground.unwrap_or_default();
-        Ok(Experience {
-            experience_id: experience_code.to_usize()? as u32,
-            share_code: experience_code.into(),
-            playground_name: p_data.playground_name,
-            playground_description: p_data.playground_description,
-            playground_data: serde_json::to_value(&playground)?,
-        })
-    }
-}
+use super::models::{CurrentExperience, Experience};
 
 pub struct MysqlClient {
     pub client: MysqlConnection,
@@ -49,6 +19,31 @@ impl MysqlClient {
         let connection = MysqlConnection::establish(&database_url).unwrap();
 
         Ok(MysqlClient { client: connection })
+    }
+
+    pub fn current_experience(&mut self) -> anyhow::Result<u32> {
+        let current_id: Option<u32> = current_experiences::table()
+            .select(code)
+            .first(&mut self.client)
+            .optional()?;
+
+        if let Some(e) = current_id {
+            return Ok(e);
+        }
+        diesel::insert_into(current_experiences::table())
+            .values(CurrentExperience { id: 1, code: 0 })
+            .execute(&mut self.client);
+        return Ok(0);
+    }
+
+    pub fn set_current_experience(&mut self, current_id: u32) {
+        let _ = diesel::replace_into(current_experiences::table())
+            .values(&CurrentExperience {
+                id: 1,
+                code: current_id,
+            })
+            .execute(&mut self.client)
+            .expect("Error saving current experience id");
     }
 
     pub fn has_experience(&mut self, _share_code: String) -> bool {
