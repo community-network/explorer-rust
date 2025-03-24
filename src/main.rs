@@ -117,7 +117,7 @@ async fn main() -> anyhow::Result<()> {
         }
 
         // don't go to fast, otherwise you will get temporarily blocked.
-        sleep(Duration::from_secs(1)).await;
+        sleep(Duration::from_secs(5)).await;
 
         last_update.store(
             chrono::Utc::now().timestamp() / 60,
