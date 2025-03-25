@@ -19,5 +19,5 @@ HEALTHCHECK --interval=5m --timeout=3s --start-period=5s \
 
 COPY server.pem .
 COPY --from=builder /usr/local/cargo/bin/explorer /usr/local/bin/explorer
-RUN apt-get update && apt-get upgrade -y && apt-get install --assume-yes curl protobuf-compiler libprotobuf-dev && apt-get clean
+RUN apt-get update && apt-get upgrade -y && apt-get install --assume-yes curl protobuf-compiler libprotobuf-dev libmariadb-dev && apt-get clean
 CMD ["explorer"]
