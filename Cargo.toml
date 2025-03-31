@@ -38,7 +38,7 @@ branch = "main"
 git = "https://github.com/community-network/grpc-rust"
 branch = "main"
 
-[dependencies.openapi]
-path = "../gametools-client-rust"
+# [dependencies.openapi]
+# path = "../gametools-client-rust"
 # git = "https://github.com/community-network/gametools-client-rust"
 # branch = "main"
