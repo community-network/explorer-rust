@@ -1,0 +1,9 @@
+bf2042_playground_bf2042_playground_get(
+    &Configuration::new(),
+    None,
+    Some(&String::from(e_code.clone())),
+    Some(false),
+    Some(false),
+    Some("en-us"),
+)
+.await?;

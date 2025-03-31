@@ -2,22 +2,26 @@
 
 diesel::table! {
     current_experiences (id) {
-        id -> Integer,
-        code -> Unsigned<Integer>,
+        id -> Int4,
+        code -> Int4,
     }
 }
 
 diesel::table! {
     experiences (experience_id) {
-        experience_id -> Unsigned<Integer>,
+        experience_id -> Int4,
         #[max_length = 25]
         share_code -> Varchar,
         #[max_length = 255]
         playground_name -> Varchar,
         playground_description -> Text,
-        playground_data -> Json,
+        playground_data -> Jsonb,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+        playground_created_at -> Timestamp,
+        playground_updated_at -> Timestamp,
+        progression_mode -> Jsonb,
+        tags -> Jsonb,
     }
 }
 

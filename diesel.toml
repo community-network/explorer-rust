@@ -2,8 +2,8 @@
 # see https://diesel.rs/guides/configuring-diesel-cli
 
 [print_schema]
-file = "src/connectors/mysql/schema.rs"
+file = "src/connectors/postgres/schema.rs"
 custom_type_derives = ["diesel::query_builder::QueryId", "Clone"]
 
 [migrations_directory]
-dir = "/Users/zjobse/code/rust/explorer/migrations"
+dir = "/Users/zjobse/code/rust/explorer-rust/migrations"

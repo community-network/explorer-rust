@@ -9,9 +9,10 @@ mongodb = "3.2.3"
 chrono = "0.4"
 log = "0.4"
 flexi_logger = "0.29"
-diesel = { version = "2.2", features = [ "mysql", "chrono", "serde_json" ] }
+diesel = { version = "2.2", features = [ "postgres", "chrono", "serde_json" ] }
 dotenvy = "0.15.7"
 serde_json = "1.0"
+reqwest = "0.12.15"
 
 [dependencies.warp]
 version = "0.3"
@@ -36,3 +37,8 @@ branch = "main"
 [dependencies.grpc-rust]
 git = "https://github.com/community-network/grpc-rust"
 branch = "main"
+
+[dependencies.openapi]
+path = "../gametools-client-rust"
+# git = "https://github.com/community-network/gametools-client-rust"
+# branch = "main"
