@@ -15,6 +15,9 @@ CREATE TABLE "experiences"(
 	"playground_created_at" TIMESTAMP NOT NULL,
 	"playground_updated_at" TIMESTAMP NOT NULL,
 	"progression_mode" JSONB NOT NULL,
-	"tags" JSONB NOT NULL
+	"tags" JSONB NOT NULL,
+	"modes" TEXT[] NOT NULL,
+	"maps" TEXT[] NOT NULL,
+	"game_sizes" INT4[] NOT NULL
 );
 

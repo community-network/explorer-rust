@@ -22,6 +22,9 @@ diesel::table! {
         playground_updated_at -> Timestamp,
         progression_mode -> Jsonb,
         tags -> Jsonb,
+        modes -> Array<Nullable<Text>>,
+        maps -> Array<Nullable<Text>>,
+        game_sizes -> Array<Nullable<Int4>>,
     }
 }
 

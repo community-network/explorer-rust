@@ -19,6 +19,9 @@ pub struct Experience {
     pub playground_updated_at: NaiveDateTime,
     pub playground_data: serde_json::Value,
     pub tags: serde_json::Value,
+    pub maps: Vec<Option<String>>,
+    pub game_sizes: Vec<Option<i32>>,
+    pub modes: Vec<Option<String>>,
     pub progression_mode: serde_json::Value,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -30,6 +33,15 @@ impl Experience {
         playground: PlaygroundInfo,
     ) -> anyhow::Result<Self> {
         let p_data = playground.clone().original_playground.unwrap_or_default();
+        let map_rotations = p_data.map_rotation.unwrap_or_default().maps;
+        let mut maps: Vec<Option<String>> = vec![];
+        let mut game_sizes: Vec<Option<i32>> = vec![];
+        let mut modes: Vec<Option<String>> = vec![];
+        for map_rotation in map_rotations {
+            maps.push(Some(map_rotation.mapname));
+            game_sizes.push(Some(map_rotation.game_size as i32));
+            modes.push(Some(map_rotation.mode));
+        }
         Ok(Experience {
             experience_id: experience_code.to_usize()? as i32,
             share_code: experience_code.into(),
@@ -60,6 +72,9 @@ impl Experience {
             )
             .unwrap_or_default()
             .naive_utc(),
+            maps: maps,
+            game_sizes: game_sizes,
+            modes: modes,
             created_at: Utc::now().naive_utc(),
             updated_at: Utc::now().naive_utc(),
         })
