@@ -18,6 +18,8 @@ HEALTHCHECK --interval=5m --timeout=3s --start-period=5s \
   CMD curl -f http://127.0.0.1:3030/ || exit 1
 
 COPY server.pem .
-COPY --from=builder /usr/local/cargo/bin/explorer /usr/local/bin/explorer
+COPY --from=builder /usr/local/cargo/bin/standalone /usr/local/bin/standalone
+COPY --from=builder /usr/local/cargo/bin/rabbit_host /usr/local/bin/rabbit_host
+COPY --from=builder /usr/local/cargo/bin/rabbit_worker /usr/local/bin/rabbit_worker
 RUN apt-get update && apt-get upgrade -y && apt-get install --assume-yes curl protobuf-compiler libprotobuf-dev libmariadb-dev libpq-dev && apt-get clean
-CMD ["explorer"]
+CMD ["standalone"]
