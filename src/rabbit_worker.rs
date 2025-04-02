@@ -137,7 +137,7 @@ impl FunctionWorker {
                 .store(current_timestamp_minutes, atomic::Ordering::Relaxed);
 
             // don't go to fast, otherwise you will get temporarily blocked.
-            sleep(Duration::from_secs(3)).await;
+            sleep(Duration::from_secs(5)).await;
         }
 
         Ok(())
