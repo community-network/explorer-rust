@@ -2,17 +2,30 @@
 name = "explorer"
 version = "0.1.0"
 edition = "2021"
+default-run = "standalone"
 
 [dependencies]
 anyhow = "1.0"
 mongodb = "3.2.3"
 chrono = "0.4"
 log = "0.4"
-flexi_logger = "0.29"
+flexi_logger = "0.30"
 diesel = { version = "2.2", features = [ "postgres", "chrono", "serde_json" ] }
 dotenvy = "0.15.7"
 serde_json = "1.0"
 reqwest = "0.12.15"
+amq-protocol-types = "8.1"
+lapin = "2.5"
+base64 = "0.22"
+futures = "0.3"
+
+[dependencies.uuid]
+version = "1.11"
+features = [
+    "v4",                # Lets you generate random UUIDs
+    "fast-rng",          # Use a faster (but still sufficiently random) RNG
+    "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
+]
 
 [dependencies.warp]
 version = "0.3"
@@ -42,3 +55,16 @@ branch = "main"
 # path = "../gametools-client-rust"
 # git = "https://github.com/community-network/gametools-client-rust"
 # branch = "main"
+
+
+[[bin]]
+name = "standalone"
+path = "src/main.rs"
+
+[[bin]]
+name = "rabbit_host"
+path = "src/rabbit_host.rs"
+
+[[bin]]
+name = "rabbit_worker"
+path = "src/rabbit_worker.rs"

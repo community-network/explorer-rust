@@ -7,6 +7,7 @@ use mongodb::{results::UpdateResult, Client, Collection};
 
 use super::models::BackendCookie;
 
+#[derive(Clone)]
 pub struct MongoClient {
     pub backend_cookies: Collection<BackendCookie>,
     pub client: Client,
