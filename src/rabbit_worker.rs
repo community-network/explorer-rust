@@ -116,7 +116,10 @@ impl FunctionWorker {
 
             let response = match result {
                 Ok(_) => "okay",
-                Err(_) => "error",
+                Err(e) => {
+                    log::error!("{} failed: {:#?}", current_experience, e);
+                    "error"
+                }
             };
 
             // Send a response
