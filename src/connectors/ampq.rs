@@ -1,3 +1,4 @@
+use core::str;
 use std::env;
 
 use base64::{prelude::BASE64_STANDARD, Engine};
@@ -10,13 +11,13 @@ use lapin::{
 
 async fn get_tls_config() -> OwnedTLSConfig {
     let client_cert_and_key = env::var("AMQPS_CERT_CLIENT").expect("AMQPS_CERT_CLIENT wasn't set");
-
+    let cert_chain = env::var("AMQPS_CERT").expect("AMQPS_CERT wasn't set");
     OwnedTLSConfig {
         identity: Some(OwnedIdentity {
             der: BASE64_STANDARD.decode(client_cert_and_key).unwrap(),
             password: env::var("AMQPS_CERT_PASS").expect("AMQPS_CERT_PASS wasn't set"),
         }),
-        cert_chain: Some(env::var("AMQPS_CERT").expect("AMQPS_CERT wasn't set")),
+        cert_chain: Some(String::from_utf8(BASE64_STANDARD.decode(cert_chain).unwrap()).unwrap()),
     }
 }
 
