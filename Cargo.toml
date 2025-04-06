@@ -68,3 +68,7 @@ path = "src/rabbit_host.rs"
 [[bin]]
 name = "rabbit_worker"
 path = "src/rabbit_worker.rs"
+
+[[bin]]
+name = "check_code"
+path = "src/check_code.rs"
