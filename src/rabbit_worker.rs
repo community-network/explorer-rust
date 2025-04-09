@@ -115,7 +115,15 @@ impl FunctionWorker {
                 .await?;
 
             let response = match result {
-                Ok(_) => "okay",
+                Ok(_) => {
+                    // healthcheck
+                    let current_timestamp_minutes =
+                        Utc::now().timestamp().checked_div(60).unwrap_or_default();
+                    self.last_update
+                        .store(current_timestamp_minutes, atomic::Ordering::Relaxed);
+
+                    "okay"
+                }
                 Err(e) => {
                     log::error!("{} failed: {:#?}", current_experience, e);
                     "error"
@@ -129,12 +137,6 @@ impl FunctionWorker {
                 format!("{};{}", current_experience, response),
             )
             .await?;
-
-            // healthcheck
-            let current_timestamp_minutes =
-                Utc::now().timestamp().checked_div(60).unwrap_or_default();
-            self.last_update
-                .store(current_timestamp_minutes, atomic::Ordering::Relaxed);
 
             // don't go to fast, otherwise you will get temporarily blocked.
             sleep(Duration::from_secs(6)).await;
