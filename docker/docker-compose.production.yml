@@ -5,8 +5,7 @@ services:
     environment:
       - DATABASE_URL={{MYSQL_DB_URL}}
       - MONGO_DETAILS_STRING={{MONGO_DETAILS_STRING}}
-      - API_MAIN_ACCOUNT={{API_MAIN_ACCOUNT}}
-      - API_MAIN_ACCOUNT_PASSWORD={{API_MAIN_ACCOUNT_PASSWORD}}
+      - API_BF2042_ACCOUNT={{API_BF2042_ACCOUNT}}
     healthcheck:
       test: curl -fk http://localhost:3030/ || exit 1
       interval: "60s"

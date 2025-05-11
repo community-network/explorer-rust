@@ -6,6 +6,7 @@ pub struct BackendCookie {
     pub _id: String,
     pub sid: String,
     pub remid: String,
+    pub ea_access_token: Option<String>,
 }
 
 impl From<BackendCookie> for Cookie {

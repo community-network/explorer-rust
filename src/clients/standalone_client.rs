@@ -14,35 +14,21 @@ pub struct StandaloneClient {
 impl StandaloneClient {
     pub async fn connect(&mut self, mut mongo_client: MongoClient) -> anyhow::Result<()> {
         dotenv().ok();
-        let main_account = env::var("API_MAIN_ACCOUNT").expect("API_MAIN_ACCOUNT must be set");
-        let password =
-            env::var("API_MAIN_ACCOUNT_PASSWORD").expect("API_MAIN_ACCOUNT_PASSWORD must be set");
+        let bf2042_account =
+            env::var("API_BF2042_ACCOUNT").expect("API_BF2042_ACCOUNT must be set");
 
-        let mut cookie = match mongo_client.get_cookies(&main_account).await {
+        let (bf2042_cookie, ea_access_token) = match mongo_client.get_cookies(&bf2042_account).await
+        {
             Ok(result) => result,
-            Err(_) => bf_sparta::cookie::Cookie {
-                sid: "".to_string(),
-                remid: "".to_string(),
-            },
-        };
-
-        cookie = match sparta_api::get_token(cookie.clone(), "pc", "tunguska", "en-us").await {
-            Ok(_) => cookie.clone(),
             Err(e) => {
-                log::warn!("Cookie failed, {} - requesting new cookie", e);
-                let cookie_auth = cookie_request::request_cookie(cookie_request::Login {
-                    email: main_account.clone(),
-                    pass: password,
-                })
-                .await?;
-                let cookie = bf_sparta::cookie::Cookie {
-                    sid: cookie_auth.sid,
-                    remid: cookie_auth.remid,
-                };
-                mongo_client
-                    .push_new_cookies(&main_account, &cookie)
-                    .await?;
-                cookie
+                log::warn!("Cookie failed, {}", e);
+                (
+                    bf_sparta::cookie::Cookie {
+                        sid: "".to_string(),
+                        remid: "".to_string(),
+                    },
+                    "".to_string(),
+                )
             }
         };
 
@@ -52,7 +38,10 @@ impl StandaloneClient {
         };
 
         let mut kingston_client = KingstonClient::new(session_id.clone()).await?;
-        match kingston_client.auth(cookie.clone()).await {
+        match kingston_client
+            .ea_desktop_auth(bf2042_cookie, ea_access_token)
+            .await
+        {
             Ok(_) => {}
             Err(e) => anyhow::bail!("kingston session failed: {:#?}", e),
         };

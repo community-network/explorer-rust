@@ -32,7 +32,7 @@ version = "0.3"
 features = ["tls"]
 
 [dependencies.tokio]
-version = "1.44"
+version = "1.45"
 features = ["full"]
 
 [dependencies.bson]
